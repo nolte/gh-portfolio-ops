@@ -1,10 +1,26 @@
+# https://taskfile.dev
+
 version: "3"
 
+vars:
+  # Shared task collection from nolte/taskfiles (tracks develop, the portfolio
+  # baseline). Provides the `mkdocs:*` and `pre-commit:*` task namespaces.
+  TASK_COLLECTION_BASE: https://raw.githubusercontent.com/nolte/taskfiles/develop/src
+
+includes:
+  mkdocs: "{{.TASK_COLLECTION_BASE}}/taskfile-include-mkdocs.yaml"
+  pre-commit: "{{.TASK_COLLECTION_BASE}}/taskfile-include-pre-commit.yaml"
+
 tasks:
+  default:
+    cmds:
+      - task -l
+    silent: true
+
   setup:
     desc: Install pre-commit hooks and documentation dependencies
     cmds:
-      - pre-commit install
+      - task: pre-commit:install
       - pip install -r docs/requirements.txt
 
   lint:
@@ -18,7 +34,7 @@ tasks:
       - bash tests/test_scripts.sh
 
   docs:
-    desc: Build the MkDocs site
+    desc: Build the MkDocs site (serve locally with `task mkdocs:start`)
     cmds:
       - mkdocs build --strict
 

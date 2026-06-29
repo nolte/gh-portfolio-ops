@@ -21,7 +21,9 @@ jobs:
         with:
           python-version: "3.x"
       - run: pip install pre-commit
+      # --yes auto-trusts the remote Taskfile includes (nolte/taskfiles) in the
+      # non-interactive CI run; without it task exits 104 on the trust prompt.
       - name: Lint
-        run: task lint
+        run: task --yes lint
       - name: Test
-        run: task test
+        run: task --yes test

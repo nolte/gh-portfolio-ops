@@ -11,6 +11,9 @@ __pycache__/
 # MkDocs build output
 site/
 
+# Task remote-include cache (nolte/taskfiles)
+.task/
+
 # OS / editor cruft
 .DS_Store
 *.swp
