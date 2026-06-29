@@ -27,3 +27,7 @@ jobs:
         run: task --yes lint
       - name: Test
         run: task --yes test
+      - name: Install docs dependencies
+        run: pip install -r docs/requirements.txt
+      - name: Docs (mkdocs build --strict)
+        run: task --yes docs

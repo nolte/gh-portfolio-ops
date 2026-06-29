@@ -1,6 +1,9 @@
 site_name: gh-portfolio-ops
 site_description: Scheduled and dispatch automation jobs across the nolte/* GitHub portfolio
 repo_url: https://github.com/nolte/gh-portfolio-ops
+# Required by mkdocs-static-i18n to build absolute language-switcher and
+# hreflang links on the GitHub-Pages project subpath.
+site_url: https://nolte.github.io/gh-portfolio-ops/
 docs_dir: docs
 
 theme:
@@ -20,6 +23,7 @@ plugins:
       lang:
         - en
         - de
+  - include-markdown
   - i18n:
       docs_structure: folder
       fallback_to_default: true
@@ -41,6 +45,13 @@ markdown_extensions:
   - attr_list
   - toc:
       permalink: true
+  # Required by spec/project/mermaid-diagrams (the portfolio Mermaid stack);
+  # declared explicitly even though no diagram ships yet.
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
 
 nav:
   - Home: index.md
