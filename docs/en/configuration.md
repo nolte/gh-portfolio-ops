@@ -29,11 +29,19 @@ Local, git-ignored values:
 The `MERGE_QUEUE_TOKEN` secret holds a personal access token. Terraform stores
 it, but cannot create it:
 
-- **Type:** classic PAT (a fine-grained PAT cannot reach personal-account
-  Projects V2).
-- **Scopes:** `repo` + `project`.
-- **Minted** in the GitHub UI only: *Settings → Developer settings → Personal
-  access tokens*.
+- **Type:** classic PAT — a fine-grained PAT cannot reach personal-account
+  Projects V2.
+- **Required scopes** — tick exactly these two top-level checkboxes under
+  *Settings → Developer settings → Personal access tokens → Tokens (classic)*:
+
+  | Scope | Why the sync needs it |
+  |---|---|
+  | `repo` (full) | Apply the `automerge` label to pull requests across every `nolte/*` repository — private ones included — via `POST /repos/{owner}/{repo}/issues/{n}/labels`, and read the open pull requests to reconcile the board. |
+  | `project` | Read and write the user-level Projects V2 board: add items, read each item's `Status`, and delete items from archived repositories. Ticking `project` also includes `read:project`. |
+
+  No other scopes are required — do not grant `admin:*`, `workflow`, or
+  `delete_repo`.
+- **Minted** in the GitHub UI only.
 - **Stored** in gopass:
   `gopass insert internet/github.com/nolte/tokens/gh-portfolio-ops/merge-queue-pat`.
 - **Fed** to Terraform as `TF_VAR_merge_queue_token` via
