@@ -70,9 +70,9 @@ while : ; do
     else
       echo "     ! label '$LABEL' missing in that repo (or PR not editable) — skipped"
     fi
-  done < <(echo "$resp" | jq -r --arg done "$DONE_OPTION" '
+  done < <(echo "$resp" | jq -r --arg doneopt "$DONE_OPTION" '
     .data.user.projectV2.items.nodes[]
-    | select(.status?.name == $done)
+    | select(.status?.name == $doneopt)
     | select(.content?.state == "OPEN")
     | .content.url')
 
