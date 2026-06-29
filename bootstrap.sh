@@ -24,8 +24,8 @@ gh project field-list "$NUMBER" --owner "$OWNER" --format json \
   | jq -r '.fields[] | select(.name=="Status") | .options[].name' \
   | sed 's/^/      - /' || echo "      (no Status field — add one with a 'Done' option in the UI)"
 
-echo "==> Creating + pushing repo ${REPO} ..."
-git init -q
+echo "==> Creating + pushing repo ${REPO} (default branch develop) ..."
+git init -q -b develop
 git add -A
 git -c user.name=nolte -c user.email=nolte07@gmail.com commit -q -m "feat: gh-portfolio-ops with merge-queue board sync"
 gh repo create "$REPO" --private --source=. --remote=origin --push
@@ -41,10 +41,15 @@ they are owned by Terraform in terraform-github-bootstrap. Next:
         gopass insert internet/github.com/nolte/tokens/gh-portfolio-ops/merge-queue-pat
   2. Record the board number for Terraform:
         echo 'project_number = ${NUMBER}' >> terraform/portfolio-ops/terraform.tfvars
-  3. Apply (sets the variable + secret on ${REPO}):
+  3. Provision the variable + secret on ${REPO}:
         source scripts/portfolio-ops-env.sh && task tf:apply:portfolio-ops
-  4. In the board UI (${URL}) add a 'Board' layout view grouped by Status
+  4. Adopt the repo into the inventory (it is already listed in
+     terraform/repos/terraform.tfvars), then apply the ruleset:
+        terraform -chdir=terraform/repos import \\
+          'github_repository.managed["gh-portfolio-ops"]' gh-portfolio-ops
+        task tf:apply
+  5. In the board UI (${URL}) add a 'Board' layout view grouped by Status
      so you get the Todo / In Progress / Done kanban columns.
-  5. Trigger the first sync:
+  6. Trigger the first sync:
         gh workflow run "Merge Queue Sync" --repo ${REPO}
 EOF

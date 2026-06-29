@@ -1,0 +1,5 @@
+# Per-repository spec configuration.
+# Canonical language is the source of truth; translations are kept in sync.
+canonical_language: en
+languages: [en, de]
+spec_root: spec
