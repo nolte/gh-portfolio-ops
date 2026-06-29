@@ -58,6 +58,18 @@ Das Portfolio **MUSS** mindestens die folgenden Sichten bereitstellen. Die Spalt
 Oberfläche benennt, wo die Sicht lebt; mehrere Sichten sind gespeicherte Views auf
 dem einen Projects-V2-Board, andere sind eigene GitHub-Oberflächen.
 
+- **Open pull requests by repository (Tabelle)** — Zielgruppe: Maintainer
+  (operativ). Frage: Welche offenen Pull Requests gibt es im Portfolio, nach
+  Projekt organisiert? Detailgrad: item-level (bewusst *nicht* feld-level). Form:
+  Tabelle. Oberfläche: die Default-Tabellen-View des Projects-V2-Boards (zum
+  Beispiel „View 1"). Konfiguration: **gruppiert nach dem Feld `Repository`**; die
+  sichtbaren Spalten sind auf einen **minimalen Satz — `Repository`, `Title`,
+  `Status`** — begrenzt, alle anderen Felder ausgeblendet; `Repository` ist ein
+  eigenes, erstklassiges Feld, sichtbar gehalten und sowohl zum Gruppieren als
+  auch zum Sortieren genutzt. Schließt aus: die dichten Metadaten-Spalten
+  (Assignees, Labels, Reviewer, Daten, Milestone) standardmäßig — sie bleiben auf
+  Anforderung verfügbar. Dies ist die kanonische tabellarische Master-Sicht des
+  Boards
 - **Daily development** — Zielgruppe: Maintainer (operativ). Frage: Was ist in
   Arbeit und was ist blockiert? Detailgrad: item-level. Form: Kanban-Board.
   Oberfläche: Projects-V2-Board-View gruppiert nach `Status`. Filter: offene Items
@@ -112,6 +124,17 @@ dem einen Projects-V2-Board, andere sind eigene GitHub-Oberflächen.
   `branching-model` und `release-automation`). Schließt aus: geplante oder
   laufende Arbeit
 
+### Tabellen-Konventionen
+- Eine Tabellen-View **MUSS** auf einen minimalen Spaltensatz defaulten und **DARF
+  NICHT** den vollständigen Feld-Katalog zeigen; Identität plus Zustand ist der
+  Default (`Repository`, `Title`, `Status`), jedes weitere Feld ist opt-in und
+  respektiert das Progressive-Disclosure-Limit aus
+  [`view-design-principles`](../view-design-principles/de.md)
+- Wo eine Tabelle über Repositories spannt, **MUSS** sie `Repository` als eigenes,
+  sichtbares Feld behalten und **SOLLTE** danach gruppieren; `Repository` **MUSS**
+  als Sortierschlüssel verfügbar sein, damit der Maintainer die Tabelle nach
+  Projekt ordnen kann
+
 ### Oberflächenübergreifende Konsistenz
 - Die nach außen gerichteten Sichten (Roadmap, Release Notes) **MÜSSEN** eine
   kuratierte Projektion des internen Zustands (Board, Changelog) sein: dieselben
@@ -123,6 +146,7 @@ dem einen Projects-V2-Board, andere sind eigene GitHub-Oberflächen.
 
 ## Akzeptanzkriterien
 - [ ] Ein benannter Sicht-Katalog existiert; jeder Eintrag deklariert Zielgruppe, Leitfrage, primären Detailgrad, Darstellungsform, GitHub-Oberfläche, Filter/Konfiguration und ausgeschlossenes Rauschen
+- [ ] Die Tabelle **Open pull requests by repository** ist nach dem Feld `Repository` gruppiert, zeigt nur die minimalen Spalten `Repository`, `Title`, `Status` und behält `Repository` als eigenen Sortierschlüssel; alle anderen Felder sind standardmäßig ausgeblendet
 - [ ] Die Sicht **Daily development** ist item-level auf einem Board und schließt Dependency-Updates aus; die Sicht **Release management** hebt auslieferungsbereite Pull Requests hervor und ist die Fläche, von der aus `Done` → `automerge` getrieben wird
 - [ ] Die Sicht **Dependency updates** ist nach Update-Typ/Risiko über den `dependencies`-Marker (oder das gespiegelte `Class`-Feld) gruppiert
 - [ ] Die Sicht **Portfolio health** ist über Insights aggregiert; die Sicht **Roadmap** ist zeit-aggregiert und stellt standardmäßig keine harten Datums-Zusagen dar

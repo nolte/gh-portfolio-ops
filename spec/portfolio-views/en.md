@@ -53,6 +53,17 @@ The portfolio **MUST** provide at least the following views. The surface column
 names where the view lives; several views are saved views on the single
 Projects V2 board, others are separate GitHub surfaces.
 
+- **Open pull requests by repository (table)** — audience: maintainer
+  (operational). Question: what open pull requests exist across the portfolio,
+  organised by project? Detail: item-level (deliberately *not* field-level).
+  Form: table. Surface: the Projects V2 board's default table view (for example
+  "View 1"). Configuration: **grouped by the `Repository` field**; the visible
+  columns are limited to a **minimal set — `Repository`, `Title`, `Status`** —
+  with every other field hidden; `Repository` is a dedicated, first-class field,
+  kept visible and used for both grouping and sorting. Excludes: the dense
+  metadata columns (assignees, labels, reviewers, dates, milestone) by default —
+  they stay available on demand. This is the canonical tabular master view of the
+  board
 - **Daily development** — audience: maintainer (operational). Question: what is in
   progress and what is blocked? Detail: item-level. Form: Kanban board. Surface:
   Projects V2 board view grouped by `Status`. Filter: open items excluding
@@ -101,6 +112,16 @@ Projects V2 board, others are separate GitHub surfaces.
   labels (see `branching-model` and `release-automation`). Excludes: planned or
   in-progress work
 
+### Table conventions
+- A table view **MUST** default to a minimal column set and **MUST NOT** surface
+  the full field catalogue; identity plus state is the default (`Repository`,
+  `Title`, `Status`), and any further field is opt-in, honouring the
+  progressive-disclosure limit in
+  [`view-design-principles`](../view-design-principles/en.md)
+- Where a table spans repositories, it **MUST** keep `Repository` as a dedicated,
+  visible field and **SHOULD** group by it; `Repository` **MUST** be available as
+  a sort key, so the maintainer can order the table by project
+
 ### Cross-surface consistency
 - The external-facing views (roadmap, release notes) **MUST** be a curated
   projection of the internal state (board, changelog): the same themes and
@@ -111,6 +132,7 @@ Projects V2 board, others are separate GitHub surfaces.
 
 ## Acceptance Criteria
 - [ ] A named view catalogue exists; each entry declares audience, leading question, primary detail level, presentation form, GitHub surface, filter/configuration, and excluded noise
+- [ ] The **Open pull requests by repository** table is grouped by the `Repository` field, shows only the minimal columns `Repository`, `Title`, `Status`, and keeps `Repository` as a dedicated sort key; all other fields are hidden by default
 - [ ] The **Daily development** view is item-level on a board and excludes dependency updates; the **Release management** view surfaces release-ready pull requests and is the surface from which `Done` → `automerge` is driven
 - [ ] The **Dependency updates** view is grouped by update type/risk over the `dependencies` marker (or mirrored `Class` field)
 - [ ] The **Portfolio health** view is aggregated via Insights; the **Roadmap** view is time-aggregated and presents no hard date commitments by default
