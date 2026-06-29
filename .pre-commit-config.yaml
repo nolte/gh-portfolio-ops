@@ -7,6 +7,8 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
+        # --unsafe: allow mkdocs.yml's !!python/name: tags (superfences)
+        args: [--allow-multiple-documents, --unsafe]
       - id: check-merge-conflict
       - id: check-executables-have-shebangs
 
