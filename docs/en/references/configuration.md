@@ -24,6 +24,8 @@ hand on the repository:
 | `MERGE_QUEUE_TOKEN` (Actions **secret**) | `github_actions_secret` | `terraform/portfolio-ops/merge-queue.tf` |
 | Repository (`description`, `visibility`, `has_*`) | `github_repository` | `terraform/repos` |
 | `develop` branch protection ruleset (require a PR, require the `check` status check, linear history, block force-pushes and deletions) | `github_repository_ruleset` | `terraform/repos` |
+| `PORTFOLIO_APP_ID` (Actions **variable**) | `github_actions_variable` (portfolio-app module) | `terraform/portfolio-app` |
+| `PORTFOLIO_APP_PRIVATE_KEY` (Actions **secret**) | `github_actions_secret` (portfolio-app module) | `terraform/portfolio-app` |
 
 Local, git-ignored values:
 
@@ -31,6 +33,25 @@ Local, git-ignored values:
   (the board at `https://github.com/users/nolte/projects/5`).
 - `terraform/repos/terraform.tfvars` → the `gh-portfolio-ops` repository block
   (visibility `public`, default branch `develop`, the ruleset above).
+- `terraform/portfolio-app/terraform.tfvars` → `gh-portfolio-ops` listed in
+  `consumer_repositories`, so it receives the portfolio-App variable and secret.
+
+### Portfolio GitHub App credentials
+
+`PORTFOLIO_APP_ID` and `PORTFOLIO_APP_PRIVATE_KEY` carry the `nolte-portfolio-app`
+credentials that the `automerge` and `release-publish` workflows use to mint a
+short-lived installation token. The `terraform/portfolio-app` module provisions
+them onto every repository in its `consumer_repositories` list; the App ID, slug,
+and private key come from gopass
+(`internet/github.com/nolte/apps/nolte-portfolio-app/{appid,slug,private_key}`)
+via `source scripts/portfolio-app-env.sh && task tf:apply:portfolio-app`.
+
+!!! warning "App installation is a separate prerequisite"
+    Provisioning only places the credentials. Minting the token also requires the
+    **`nolte-portfolio-app` GitHub App to be installed on this repository** (repo
+    access granted). Without the installation, `automerge` and `release-publish`
+    fail at runtime even with the variable and secret present. Verify under
+    *Settings → Installations → nolte-portfolio-app → Repository access*.
 
 ## The PAT (minted by hand, then fed to Terraform)
 

@@ -24,6 +24,8 @@ von Hand am Repository gesetzt werden:
 | `MERGE_QUEUE_TOKEN` (Actions-**Secret**) | `github_actions_secret` | `terraform/portfolio-ops/merge-queue.tf` |
 | Repository (`description`, `visibility`, `has_*`) | `github_repository` | `terraform/repos` |
 | `develop`-Branch-Protection-Ruleset (PR-Pflicht, `check`-Status-Check verlangt, linear history, Force-Pushes und Löschungen blocken) | `github_repository_ruleset` | `terraform/repos` |
+| `PORTFOLIO_APP_ID` (Actions-**Variable**) | `github_actions_variable` (portfolio-app-Modul) | `terraform/portfolio-app` |
+| `PORTFOLIO_APP_PRIVATE_KEY` (Actions-**Secret**) | `github_actions_secret` (portfolio-app-Modul) | `terraform/portfolio-app` |
 
 Lokale, gitignored Werte:
 
@@ -31,6 +33,27 @@ Lokale, gitignored Werte:
   (das Board unter `https://github.com/users/nolte/projects/5`).
 - `terraform/repos/terraform.tfvars` → der `gh-portfolio-ops`-Repository-Block
   (Visibility `public`, Default-Branch `develop`, das obige Ruleset).
+- `terraform/portfolio-app/terraform.tfvars` → `gh-portfolio-ops` in
+  `consumer_repositories` gelistet, damit es Variable und Secret der Portfolio-App
+  erhält.
+
+### Portfolio-GitHub-App-Credentials
+
+`PORTFOLIO_APP_ID` und `PORTFOLIO_APP_PRIVATE_KEY` tragen die
+`nolte-portfolio-app`-Credentials, mit denen die Workflows `automerge` und
+`release-publish` einen kurzlebigen Installation-Token minten. Das
+`terraform/portfolio-app`-Modul provisioniert sie auf jedes Repository in seiner
+`consumer_repositories`-Liste; App-ID, Slug und Private Key selbst kommen aus
+gopass (`internet/github.com/nolte/apps/nolte-portfolio-app/{appid,slug,private_key}`)
+via `source scripts/portfolio-app-env.sh && task tf:apply:portfolio-app`.
+
+!!! warning "App-Installation ist eine separate Voraussetzung"
+    Das Provisionieren legt nur die Credentials ab. Das Minten des Tokens setzt
+    zusätzlich voraus, dass die **GitHub App `nolte-portfolio-app` auf diesem
+    Repository installiert** ist (Repo-Zugriff gewährt). Ohne Installation
+    scheitern `automerge` und `release-publish` zur Laufzeit, selbst wenn Variable
+    und Secret vorhanden sind. Prüfen unter
+    *Settings → Installations → nolte-portfolio-app → Repository access*.
 
 ## Das PAT (von Hand gementet, dann an Terraform übergeben)
 
