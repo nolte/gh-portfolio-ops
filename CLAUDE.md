@@ -34,6 +34,7 @@ All reproducible commands run through the Taskfile:
 | `task test`  | Validate the scripts under `scripts/` |
 | `task docs`  | Build the MkDocs site |
 | `task check` | Aggregate quality gate (lint + test) |
+| `task sync`  | Reconcile the merge-queue board (add open PRs, prune archived, label Done → automerge) |
 
 ## Adding a concern
 

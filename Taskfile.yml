@@ -27,3 +27,12 @@ tasks:
     cmds:
       - task: lint
       - task: test
+
+  sync:
+    desc: Reconcile the PR merge-queue board — add open PRs, prune archived repos, label Done as automerge. Override the board with PROJECT_NUMBER=<n>.
+    env:
+      OWNER: nolte
+      PROJECT_NUMBER:
+        sh: echo "${PROJECT_NUMBER:-5}"
+    cmds:
+      - bash scripts/merge-queue-sync.sh
