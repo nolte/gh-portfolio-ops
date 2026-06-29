@@ -82,14 +82,32 @@ gh-plumbing-Automerge-Workflow und die Spec `release-automation`).
   des Items spiegeln, wenn das Board eine Gruppierung nach Klasse nutzt (gemäß
   [`portfolio-board`](../portfolio-board/de.md))
 
+### Board-Hygiene
+- **DARF NICHT** Pull Requests aus archivierten Repositories synchronisieren: Sie
+  werden an der Quelle herausgefiltert (`--archived=false`), und jedes Board-Item,
+  dessen Repository archiviert ist, wird geprunt — denn archivierte Repositories
+  sind read-only und ihre offenen Pull Requests können nicht gemergt werden.
+  Archivierte Items werden zudem vom `Done` → `automerge`-Labeling ausgenommen. Der
+  Prune-Pass **MUSS** über alle Seiten sammeln, bevor er löscht, damit Löschungen
+  den Pagination-Cursor nicht verschieben
+- **SOLLTE** den Projects-Built-in-Workflow *Auto-archive items* aktivieren, damit
+  gemergte oder geschlossene Pull Requests automatisch vom aktiven Board fallen.
+  Der Prune oben deckt archivierte *Repositories* ab; gemergte und geschlossene
+  *Items* werden nativ von diesem Built-in-Workflow behandelt, nicht von diesem
+  Script, sodass das Board keine ausgelieferten oder verworfenen Pull Requests
+  ansammelt
+
 ### `Done` → `automerge`
 - **MUSS** das `Status`-Feld jedes Items lesen und für jedes Item, dessen `Status`
   der konfigurierten `Done`-Option entspricht **und** dessen Pull Request noch
   offen ist, das Label `automerge` vergeben
-- **MUSS** das Label über die GraphQL-Mutation `addLabelsToLabelable` setzen (oder
-  einen äquivalenten `gh`-Aufruf), **niemals** über
-  `updateProjectV2ItemFieldValue`, das nur Projektfelder ändern kann, nicht die
-  Labels des zugrunde liegenden Issues oder Pull Requests
+- **MUSS** das Label über die GraphQL-Mutation `addLabelsToLabelable` oder den
+  äquivalenten REST-Endpoint (`POST /repos/{owner}/{repo}/issues/{n}/labels`)
+  setzen, **niemals** über `updateProjectV2ItemFieldValue` (das nur Projektfelder
+  ändern kann, nicht die Labels des zugrunde liegenden Issues oder Pull Requests)
+  und **niemals** über `gh pr edit --add-label`, das die deprecated
+  Projects-classic-`projectCards`-API abfragt und auf Accounts scheitert, auf denen
+  Projects classic abgeschaltet ist
 - **MUSS** idempotent sein: Die Vergabe von `automerge` an einen Pull Request, der
   es bereits trägt, ist ein No-op, und das Label wird höchstens einmal pro Pull
   Request vergeben
@@ -115,7 +133,9 @@ gh-plumbing-Automerge-Workflow und die Spec `release-automation`).
 - [ ] Ein geplanter Workflow (Cron-Intervall ≥ 5 Minuten) gleicht das Board ab; die Automatisierung beruht auf keinem Projekt-Webhook oder Projekt-Event-Trigger
 - [ ] Die Authentifizierung nutzt ein klassisches PAT mit `project`- und `repo`-Scopes, aus einem von Terraform bereitgestellten Repository-Secret, niemals eingecheckt
 - [ ] Jeder offene `nolte/*`-Pull-Request wird idempotent zum Board hinzugefügt
-- [ ] Pull Requests, deren `Status` der konfigurierten `Done`-Option entspricht und die noch offen sind, erhalten das Label `automerge` über `addLabelsToLabelable`
+- [ ] Pull Requests aus archivierten Repositories werden weder hinzugefügt noch behalten: Die Quell-Abfrage filtert mit `--archived=false`, und ein Prune-Pass entfernt Board-Items, deren Repository archiviert ist
+- [ ] Der Projects-Built-in-Workflow *Auto-archive items* ist aktiviert, sodass gemergte/geschlossene Pull Requests ohne manuelle Aktion das aktive Board verlassen
+- [ ] Pull Requests, deren `Status` der konfigurierten `Done`-Option entspricht und die noch offen sind, erhalten das Label `automerge` über `addLabelsToLabelable` oder den äquivalenten REST-Endpoint (niemals `gh pr edit`)
 - [ ] Das Labeling ist idempotent und überspringt Repositories ohne das `automerge`-Label mit einer Log-Zeile
 - [ ] Die Automatisierung merged Pull Requests nie direkt; Merge und Release werden an den Automerge-Workflow des Ziel-Repositories delegiert
 - [ ] Die Projekt-Item-Abfrage ist paginiert, um mehr als 100 Items abzudecken, und jeder Lauf loggt eine Zusammenfassung

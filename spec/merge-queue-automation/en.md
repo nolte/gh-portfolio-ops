@@ -72,14 +72,29 @@ downstream (that is the gh-plumbing automerge workflow and the
   Single-Select project field when the board uses class grouping (per
   [`portfolio-board`](../portfolio-board/en.md))
 
+### Board hygiene
+- **MUST NOT** sync pull requests from archived repositories: filter them out at
+  the source (`--archived=false`) and prune any board item whose repository is
+  archived, because archived repositories are read-only and their open pull
+  requests cannot be merged. Archived items are also excluded from
+  `Done` → `automerge` labeling. The prune pass **MUST** collect across every page
+  before deleting, so deletions do not shift the pagination cursor
+- **SHOULD** enable the Projects built-in *Auto-archive items* workflow so that
+  merged or closed pull requests drop off the active board automatically. The
+  prune above covers archived *repositories*; merged and closed *items* are
+  handled natively by this built-in workflow, not by this script, so the board
+  does not accumulate shipped or abandoned pull requests
+
 ### `Done` → `automerge`
 - **MUST** read each item's `Status` field and, for every item whose `Status`
   equals the configured `Done` option **and** whose pull request is still open,
   apply the `automerge` label
-- **MUST** set the label through the GraphQL `addLabelsToLabelable` mutation (or
-  an equivalent `gh` call), **never** through `updateProjectV2ItemFieldValue`,
-  which can change only project fields and not the labels of the underlying issue
-  or pull request
+- **MUST** set the label through the GraphQL `addLabelsToLabelable` mutation or
+  the equivalent REST endpoint (`POST /repos/{owner}/{repo}/issues/{n}/labels`),
+  **never** through `updateProjectV2ItemFieldValue` (which can change only project
+  fields, not the labels of the underlying issue or pull request) and **never**
+  through `gh pr edit --add-label`, which queries the deprecated Projects-classic
+  `projectCards` field and fails on accounts where Projects classic is sunset
 - **MUST** be idempotent: applying `automerge` to a pull request that already
   carries it is a no-op, and the label is applied at most once per pull request
 - **MUST** skip — with an explicit log line — any pull request in a repository
@@ -102,7 +117,9 @@ downstream (that is the gh-plumbing automerge workflow and the
 - [ ] A scheduled workflow (cron interval ≥ 5 minutes) reconciles the board; the automation relies on no project webhook or project event trigger
 - [ ] Authentication uses a classic PAT with `project` and `repo` scopes, sourced from a Terraform-provisioned repository secret, never committed
 - [ ] Every open `nolte/*` pull request is added to the board idempotently
-- [ ] Pull requests whose `Status` equals the configured `Done` option and that are still open receive the `automerge` label via `addLabelsToLabelable`
+- [ ] Pull requests from archived repositories are neither added nor retained: the source query filters with `--archived=false` and a prune pass removes board items whose repository is archived
+- [ ] The Projects built-in *Auto-archive items* workflow is enabled so merged/closed pull requests leave the active board without manual action
+- [ ] Pull requests whose `Status` equals the configured `Done` option and that are still open receive the `automerge` label via `addLabelsToLabelable` or the equivalent REST endpoint (never `gh pr edit`)
 - [ ] Labeling is idempotent and skips repositories lacking the `automerge` label with a log line
 - [ ] The automation never merges pull requests directly; merge and release are delegated to the target repository's automerge workflow
 - [ ] The project-items query is paginated to cover more than 100 items, and each run logs a summary

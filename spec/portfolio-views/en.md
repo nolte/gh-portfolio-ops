@@ -63,7 +63,10 @@ Projects V2 board, others are separate GitHub surfaces.
   kept visible and used for both grouping and sorting. Excludes: the dense
   metadata columns (assignees, labels, reviewers, dates, milestone) by default —
   they stay available on demand. This is the canonical tabular master view of the
-  board
+  board. Note: merged and closed pull requests are kept off this and every board
+  view by the Projects built-in *Auto-archive items* workflow (see
+  [`merge-queue-automation`](../merge-queue-automation/en.md) §Board hygiene), so
+  the view shows only active work
 - **Daily development** — audience: maintainer (operational). Question: what is in
   progress and what is blocked? Detail: item-level. Form: Kanban board. Surface:
   Projects V2 board view grouped by `Status`. Filter: open items excluding
@@ -133,6 +136,7 @@ Projects V2 board, others are separate GitHub surfaces.
 ## Acceptance Criteria
 - [ ] A named view catalogue exists; each entry declares audience, leading question, primary detail level, presentation form, GitHub surface, filter/configuration, and excluded noise
 - [ ] The **Open pull requests by repository** table is grouped by the `Repository` field, shows only the minimal columns `Repository`, `Title`, `Status`, and keeps `Repository` as a dedicated sort key; all other fields are hidden by default
+- [ ] Merged and closed pull requests are kept off the board's active views by the Projects built-in *Auto-archive items* workflow
 - [ ] The **Daily development** view is item-level on a board and excludes dependency updates; the **Release management** view surfaces release-ready pull requests and is the surface from which `Done` → `automerge` is driven
 - [ ] The **Dependency updates** view is grouped by update type/risk over the `dependencies` marker (or mirrored `Class` field)
 - [ ] The **Portfolio health** view is aggregated via Insights; the **Roadmap** view is time-aggregated and presents no hard date commitments by default

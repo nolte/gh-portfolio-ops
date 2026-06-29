@@ -69,7 +69,10 @@ dem einen Projects-V2-Board, andere sind eigene GitHub-Oberflächen.
   auch zum Sortieren genutzt. Schließt aus: die dichten Metadaten-Spalten
   (Assignees, Labels, Reviewer, Daten, Milestone) standardmäßig — sie bleiben auf
   Anforderung verfügbar. Dies ist die kanonische tabellarische Master-Sicht des
-  Boards
+  Boards. Hinweis: Gemergte und geschlossene Pull Requests werden von dieser und
+  jeder Board-Sicht durch den Projects-Built-in-Workflow *Auto-archive items*
+  ferngehalten (siehe [`merge-queue-automation`](../merge-queue-automation/de.md)
+  §Board-Hygiene), sodass die Sicht nur aktive Arbeit zeigt
 - **Daily development** — Zielgruppe: Maintainer (operativ). Frage: Was ist in
   Arbeit und was ist blockiert? Detailgrad: item-level. Form: Kanban-Board.
   Oberfläche: Projects-V2-Board-View gruppiert nach `Status`. Filter: offene Items
@@ -147,6 +150,7 @@ dem einen Projects-V2-Board, andere sind eigene GitHub-Oberflächen.
 ## Akzeptanzkriterien
 - [ ] Ein benannter Sicht-Katalog existiert; jeder Eintrag deklariert Zielgruppe, Leitfrage, primären Detailgrad, Darstellungsform, GitHub-Oberfläche, Filter/Konfiguration und ausgeschlossenes Rauschen
 - [ ] Die Tabelle **Open pull requests by repository** ist nach dem Feld `Repository` gruppiert, zeigt nur die minimalen Spalten `Repository`, `Title`, `Status` und behält `Repository` als eigenen Sortierschlüssel; alle anderen Felder sind standardmäßig ausgeblendet
+- [ ] Gemergte und geschlossene Pull Requests werden durch den Projects-Built-in-Workflow *Auto-archive items* von den aktiven Board-Sichten ferngehalten
 - [ ] Die Sicht **Daily development** ist item-level auf einem Board und schließt Dependency-Updates aus; die Sicht **Release management** hebt auslieferungsbereite Pull Requests hervor und ist die Fläche, von der aus `Done` → `automerge` getrieben wird
 - [ ] Die Sicht **Dependency updates** ist nach Update-Typ/Risiko über den `dependencies`-Marker (oder das gespiegelte `Class`-Feld) gruppiert
 - [ ] Die Sicht **Portfolio health** ist über Insights aggregiert; die Sicht **Roadmap** ist zeit-aggregiert und stellt standardmäßig keine harten Datums-Zusagen dar
