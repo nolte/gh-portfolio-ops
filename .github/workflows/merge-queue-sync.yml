@@ -1,0 +1,26 @@
+name: Merge Queue Sync
+
+on:
+  schedule:
+    # GitHub does not guarantee the exact minute; ~every 10 min is realistic.
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: merge-queue-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sync board and apply automerge label
+        env:
+          GH_TOKEN: ${{ secrets.MERGE_QUEUE_TOKEN }}
+          OWNER: nolte
+          PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
+        run: bash scripts/merge-queue-sync.sh
