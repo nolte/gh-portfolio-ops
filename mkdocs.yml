@@ -8,3 +8,4 @@ theme:
 
 nav:
   - Home: en/index.md
+  - Configuration: en/configuration.md
