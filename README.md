@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/nolte/gh-portfolio-ops/actions/workflows/ci.yml/badge.svg)](https://github.com/nolte/gh-portfolio-ops/actions/workflows/ci.yml)
 [![Merge-queue sync](https://github.com/nolte/gh-portfolio-ops/actions/workflows/merge-queue-sync.yml/badge.svg)](https://github.com/nolte/gh-portfolio-ops/actions/workflows/merge-queue-sync.yml)
+[![Unreleased sync](https://github.com/nolte/gh-portfolio-ops/actions/workflows/unreleased-sync.yml/badge.svg)](https://github.com/nolte/gh-portfolio-ops/actions/workflows/unreleased-sync.yml)
 
 Operational automations over the `nolte/*` GitHub portfolio. A sibling to
 [`gh-plumbing`](https://github.com/nolte/gh-plumbing) (per-repo Probot config):
@@ -43,6 +44,28 @@ Caveats:
 - Up to ~10–15 min lag between dropping a card in Done and the label appearing.
 - The `automerge` label must exist in the target repo (it does in repos wired to
   `gh-plumbing`); PRs in repos without it are skipped with a log line.
+
+### Merged-but-unreleased PRs (`unreleased-sync`)
+
+Surfaces pull requests that are **merged but not yet part of a published
+release**, in the board's `Unreleased` Status column — downstream of `Done`. A
+merged PR is unreleased when its `merge_commit_sha` is reachable from the repo's
+development tip (`develop`, else the default branch) but **not** from the latest
+*published* release tag (the released baseline, via the GitHub compare API).
+Anchoring on `merge_commit_sha` makes squash-, rebase-, and merge-commit merges
+all detect. Governed by `spec/unreleased-changes/`.
+
+Each run (hourly):
+1. For every non-archived `nolte/*` repo with a published release, computes the
+   `baseline...tip` compare range and keeps merged PRs whose merge commit is in it.
+2. Upserts those PRs onto the board with `Status = Unreleased`.
+3. Prunes board `Unreleased` items whose PR has since shipped in a release.
+
+Caveats:
+- Repos with **no published release** are skipped (the "merged since last release"
+  window is undefined) and counted in the run summary.
+- The board's built-in **Auto-archive items** workflow, if enabled, must exclude
+  the `Unreleased` status — otherwise it would archive these (merged) items.
 
 ## Setup
 

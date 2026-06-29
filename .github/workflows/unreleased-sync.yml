@@ -1,0 +1,27 @@
+name: Unreleased Sync
+
+on:
+  schedule:
+    # Hourly (offset from merge-queue-sync); unreleased status changes slowly.
+    - cron: "17 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: unreleased-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Surface merged-but-unreleased PRs on the board
+        env:
+          # Same classic PAT as merge-queue-sync (repo + project scopes).
+          GH_TOKEN: ${{ secrets.MERGE_QUEUE_TOKEN }}
+          OWNER: nolte
+          PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
+        run: bash scripts/unreleased-sync.sh
