@@ -144,7 +144,9 @@ gh-plumbing-Automerge-Workflow und die Spec `release-automation`).
 ## Offene Fragen
 - Welche maximale Latenz zwischen dem Markieren einer Karte als `Done` und dem
   Erscheinen des `automerge`-Labels ist gewünscht? Sie bestimmt das
-  Cron-Intervall und ob Polling allein akzeptabel ist.
+  Cron-Intervall und ob Polling allein akzeptabel ist. Eventgetriebene
+  Alternativen zum Poll sind in
+  [`event-driven-merge-queue`](../event-driven-merge-queue/de.md) katalogisiert.
 - Soll die eingebaute Board-Automatisierung den `Status` beim Mergen eines Pull
   Requests zusätzlich auf `Done` setzen, sodass die Spalte den gemergten Zustand
   ohne manuelles Verschieben widerspiegelt, oder bleibt `Done` strikt ein

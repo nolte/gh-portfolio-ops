@@ -128,7 +128,8 @@ downstream (that is the gh-plumbing automerge workflow and the
 ## Open Questions
 - What is the desired maximum latency between marking a card `Done` and the
   `automerge` label appearing? It drives the cron interval and whether polling
-  alone is acceptable.
+  alone is acceptable. Event-driven alternatives to the poll are catalogued in
+  [`event-driven-merge-queue`](../event-driven-merge-queue/en.md).
 - Should the board's built-in automation also set `Status` → `Done` on pull-request
   merge, so the column reflects merged state without a manual move, or is `Done`
   reserved strictly as a human "ready to ship" signal that precedes merge?
