@@ -1,3 +1,11 @@
+---
+title: Configuration
+audience: [operator]
+content_mode: reference
+track: developer-docs
+last_updated: 2026-06-29
+---
+
 # Configuration
 
 The merge-queue automation needs a small set of inputs. Most are managed as code

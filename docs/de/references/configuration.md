@@ -1,3 +1,11 @@
+---
+title: Konfiguration
+audience: [operator]
+content_mode: reference
+track: developer-docs
+last_updated: 2026-06-29
+---
+
 # Konfiguration
 
 Die Merge-Queue-Automatisierung braucht wenige Eingaben. Die meisten werden als

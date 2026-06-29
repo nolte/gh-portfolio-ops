@@ -37,6 +37,7 @@ plugins:
           build: true
           nav_translations:
             Home: Startseite
+            References: Referenzen
             Configuration: Konfiguration
 
 markdown_extensions:
@@ -55,4 +56,5 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - Configuration: configuration.md
+  - References:
+      - Configuration: references/configuration.md

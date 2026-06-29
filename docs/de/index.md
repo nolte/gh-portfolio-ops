@@ -1,3 +1,11 @@
+---
+title: gh-portfolio-ops
+audience: [operator, contributor, board-user]
+content_mode: meta
+track: developer-docs
+last_updated: 2026-06-29
+---
+
 # gh-portfolio-ops
 
 Operative Automatisierung über das `nolte/*`-GitHub-Portfolio. Schwester von
