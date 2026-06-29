@@ -1,0 +1,5 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  // Portfolio-wide Renovate preset, pinned to a gh-plumbing release tag.
+  extends: ["github>nolte/gh-plumbing//renovate-configs/common#v1.1.25"],
+}

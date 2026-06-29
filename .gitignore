@@ -1,0 +1,16 @@
+# Resumable-work in-flight state (Claude Code skills/agents)
+/.resume/
+
+# Local environment overrides
+.env
+
+# Python virtual environments
+.venv/
+__pycache__/
+
+# MkDocs build output
+site/
+
+# OS / editor cruft
+.DS_Store
+*.swp

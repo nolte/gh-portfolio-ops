@@ -1,0 +1,10 @@
+site_name: gh-portfolio-ops
+site_description: Scheduled and dispatch automation jobs across the nolte/* GitHub portfolio
+repo_url: https://github.com/nolte/gh-portfolio-ops
+docs_dir: docs
+
+theme:
+  name: material
+
+nav:
+  - Home: en/index.md

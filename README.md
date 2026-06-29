@@ -1,5 +1,8 @@
 # gh-portfolio-ops
 
+[![CI](https://github.com/nolte/gh-portfolio-ops/actions/workflows/ci.yml/badge.svg)](https://github.com/nolte/gh-portfolio-ops/actions/workflows/ci.yml)
+[![Merge-queue sync](https://github.com/nolte/gh-portfolio-ops/actions/workflows/merge-queue-sync.yml/badge.svg)](https://github.com/nolte/gh-portfolio-ops/actions/workflows/merge-queue-sync.yml)
+
 Operational automations over the `nolte/*` GitHub portfolio. A sibling to
 [`gh-plumbing`](https://github.com/nolte/gh-plumbing) (per-repo Probot config):
 this repo hosts scheduled/dispatch **jobs** that act across the whole portfolio.

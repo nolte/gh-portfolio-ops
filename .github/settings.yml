@@ -1,0 +1,9 @@
+# Repository settings as code, consumed by the Probot Settings app.
+# Portfolio-wide defaults are inherited; keep per-repo content minimal.
+_extends: nolte/gh-plumbing:.github/commons-settings.yml
+
+repository:
+  name: gh-portfolio-ops
+  description: Scheduled and dispatch automation jobs across the nolte/* GitHub portfolio
+  homepage: https://nolte.github.io/gh-portfolio-ops/
+  topics: github-actions, automation, portfolio-management, ops

@@ -1,0 +1,29 @@
+version: "3"
+
+tasks:
+  setup:
+    desc: Install pre-commit hooks and documentation dependencies
+    cmds:
+      - pre-commit install
+      - pip install -r docs/requirements.txt
+
+  lint:
+    desc: Run pre-commit across all files
+    cmds:
+      - pre-commit run --all-files
+
+  test:
+    desc: Validate the automation scripts
+    cmds:
+      - bash tests/test_scripts.sh
+
+  docs:
+    desc: Build the MkDocs site
+    cmds:
+      - mkdocs build --strict
+
+  check:
+    desc: Aggregate quality gate (lint + test)
+    cmds:
+      - task: lint
+      - task: test
