@@ -46,9 +46,18 @@ Caveats:
 
 ## Setup
 
-See [`bootstrap.sh`](./bootstrap.sh) — creates the board and this repo. The PAT
-must be minted in the GitHub UI (`repo` + `project` scopes); neither Terraform
-nor any API can create it.
+One-time, manual:
+
+1. Create the Projects V2 board and note its number:
+   `gh project create --owner nolte --title "PR Merge Queue"` (the default
+   `Status` field already carries a `Done` option).
+2. Mint a **classic** PAT with `repo` + `project` scopes in the GitHub UI —
+   neither Terraform nor any API can create it. It is provisioned onto this repo
+   as the `MERGE_QUEUE_TOKEN` secret, and the board number as the
+   `PROJECT_NUMBER` variable, by Terraform in `terraform-github-bootstrap`
+   (`terraform/portfolio-ops/`).
+3. In the board UI, enable the built-in **Auto-archive items** workflow so merged
+   and closed PRs leave the board automatically.
 
 ## Adding a concern
 

@@ -12,6 +12,6 @@ while IFS= read -r -d '' script; do
     echo "FAIL: $script" >&2
     status=1
   fi
-done < <(find "$repo_root/scripts" "$repo_root/bootstrap.sh" -name '*.sh' -print0 2>/dev/null)
+done < <(find "$repo_root/scripts" -name '*.sh' -print0 2>/dev/null)
 
 exit "$status"
