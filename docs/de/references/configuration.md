@@ -29,8 +29,11 @@ von Hand am Repository gesetzt werden:
 
 Lokale, gitignored Werte:
 
-- `terraform/portfolio-ops/terraform.tfvars` → `project_number = 5`
-  (das Board unter `https://github.com/users/nolte/projects/5`).
+- `terraform/portfolio-ops/terraform.tfvars` → `project_number = 1`
+  (das Board unter `https://github.com/orgs/noltarium/projects/1`). Das Board liegt
+  unter der **noltarium**-Organisation; die Workflows setzen `PROJECT_OWNER=noltarium`,
+  während die Quell-Repositories unter `nolte/*` bleiben (`REPO_OWNER=nolte`). Derselbe
+  klassische PAT funktioniert, weil `nolte` Org-Admin ist.
 - `terraform/repos/terraform.tfvars` → der `gh-portfolio-ops`-Repository-Block
   (Visibility `public`, Default-Branch `develop`, das obige Ruleset).
 - `terraform/portfolio-app/terraform.tfvars` → `gh-portfolio-ops` in
@@ -85,14 +88,14 @@ speichert ihn, kann ihn aber nicht erzeugen:
 GitHub bietet dafür keine Terraform-Ressource oder API — das sind einmalige
 UI-Schritte:
 
-- **Projects-V2-Board anlegen** — `gh project create --owner nolte --title "PR Merge Queue"` (der `integrations/github`-Provider hat keine Ressource für User-Level-Projects-V2).
+- **Projects-V2-Board anlegen** — `gh project create --owner noltarium --title "PR Merge Queue"` (der `integrations/github`-Provider hat keine Ressource für Projects-V2). Das Board ist org-owned; ein Org-Projekt kann trotzdem Pull Requests aus den persönlichen `nolte/*`-Repositories tracken.
 - **Board-Views** — die Tabelle gruppiert nach `Repository` und das Kanban gruppiert nach `Status` werden im Board-UI konfiguriert.
 - **Der Built-in-Workflow *Auto-archive items*** — im Board-UI aktiviert, damit gemergte und geschlossene Pull Requests automatisch vom Board fallen.
 
 ## Aktivierungs-Reihenfolge
 
 1. PAT minten und in gopass ablegen (siehe oben).
-2. In `terraform-github-bootstrap` `project_number = 5` in
+2. In `terraform-github-bootstrap` `project_number = 1` (das noltarium-Board) in
    `terraform/portfolio-ops/terraform.tfvars` setzen (lokal, gitignored).
 3. Das bestehende Repository vor dem ersten Apply in den Terraform-State
    adoptieren:

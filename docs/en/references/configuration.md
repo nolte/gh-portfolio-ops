@@ -29,8 +29,11 @@ hand on the repository:
 
 Local, git-ignored values:
 
-- `terraform/portfolio-ops/terraform.tfvars` → `project_number = 5`
-  (the board at `https://github.com/users/nolte/projects/5`).
+- `terraform/portfolio-ops/terraform.tfvars` → `project_number = 1`
+  (the board at `https://github.com/orgs/noltarium/projects/1`). The board lives
+  under the **noltarium** organisation; the workflows set `PROJECT_OWNER=noltarium`
+  while the source repositories stay under `nolte/*` (`REPO_OWNER=nolte`). The
+  same classic PAT works because `nolte` is an org admin.
 - `terraform/repos/terraform.tfvars` → the `gh-portfolio-ops` repository block
   (visibility `public`, default branch `develop`, the ruleset above).
 - `terraform/portfolio-app/terraform.tfvars` → `gh-portfolio-ops` listed in
@@ -81,14 +84,14 @@ it, but cannot create it:
 
 GitHub offers no Terraform resource or API for these — they are one-time UI steps:
 
-- **Creating the Projects V2 board** — `gh project create --owner nolte --title "PR Merge Queue"` (the `integrations/github` provider has no resource for user-level Projects V2).
+- **Creating the Projects V2 board** — `gh project create --owner noltarium --title "PR Merge Queue"` (the `integrations/github` provider has no resource for Projects V2). The board is org-owned; an org project can still track pull requests from the personal `nolte/*` repositories.
 - **Board views** — the table grouped by `Repository` and the kanban grouped by `Status` are configured in the board UI.
 - **The built-in *Auto-archive items* workflow** — enabled in the board UI so merged and closed pull requests leave the board automatically.
 
 ## Enable sequence
 
 1. Mint the PAT and store it in gopass (see above).
-2. In `terraform-github-bootstrap`, set `project_number = 5` in
+2. In `terraform-github-bootstrap`, set `project_number = 1` (the noltarium board) in
    `terraform/portfolio-ops/terraform.tfvars` (local, git-ignored).
 3. Adopt the existing repository into Terraform state before the first apply:
    `terraform -chdir=terraform/repos import 'github_repository.managed["gh-portfolio-ops"]' gh-portfolio-ops`

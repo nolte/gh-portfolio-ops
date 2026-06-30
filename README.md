@@ -72,8 +72,9 @@ Caveats:
 One-time, manual:
 
 1. Create the Projects V2 board and note its number:
-   `gh project create --owner nolte --title "PR Merge Queue"` (the default
-   `Status` field already carries a `Done` option).
+   `gh project create --owner noltarium --title "PR Merge Queue"` (the default
+   `Status` field already carries a `Done` option). The board is owned by the
+   **noltarium** org; the source repositories stay under `nolte/*`.
 2. Mint a **classic** PAT with `repo` + `project` scopes in the GitHub UI —
    neither Terraform nor any API can create it. It is provisioned onto this repo
    as the `MERGE_QUEUE_TOKEN` secret, and the board number as the

@@ -43,8 +43,9 @@ the board's shape, fields, and views only.
 ## Requirements
 
 ### Project substrate
-- **MUST** use a single GitHub Projects V2 project owned by the user account as
-  the unified portfolio board
+- **MUST** use a single GitHub Projects V2 project as the unified portfolio
+  board, owned by the `noltarium` organisation (the source repositories stay
+  under the `nolte/*` user account; an org project can track their pull requests)
 - **MUST** aggregate open issues and open pull requests from across the
   `nolte/*` repositories into that one project
 - **MUST NOT** rely on the built-in auto-add workflow as the sole population
@@ -99,7 +100,7 @@ the board's shape, fields, and views only.
   fields. Views **MUST NOT** be designed assuming cross-field OR
 
 ## Acceptance Criteria
-- [ ] A single user-level Projects V2 project aggregates open issues and pull requests across `nolte/*` repositories
+- [ ] A single Projects V2 project owned by the `noltarium` organisation aggregates open issues and pull requests across `nolte/*` repositories
 - [ ] A Single-Select `Status` field exists with `Todo`, `In Progress`, and a stable `Done` option
 - [ ] Dependency-update pull requests carry the `dependencies` label uniformly (Dependabot default plus the Renovate preset emitting it)
 - [ ] A **Daily development** view excludes dependency updates; a **Release management** view surfaces release-ready pull requests

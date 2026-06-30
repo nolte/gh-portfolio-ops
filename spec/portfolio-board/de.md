@@ -47,8 +47,10 @@ Spec definiert ausschließlich Form, Felder und Views des Boards.
 ## Anforderungen
 
 ### Projekt-Fundament
-- **MUSS** ein einzelnes GitHub-Projects-V2-Projekt im Besitz des User-Accounts
-  als einheitliches Portfolio-Board verwenden
+- **MUSS** ein einzelnes GitHub-Projects-V2-Projekt als einheitliches
+  Portfolio-Board verwenden, im Besitz der `noltarium`-Organisation (die
+  Quell-Repositories bleiben unter dem `nolte/*`-User-Account; ein Org-Projekt
+  kann deren Pull Requests tracken)
 - **MUSS** offene Issues und offene Pull Requests über die `nolte/*`-Repositories
   hinweg in diesem einen Projekt aggregieren
 - **DARF NICHT** den eingebauten Auto-Add-Workflow als alleinigen
@@ -111,7 +113,7 @@ Spec definiert ausschließlich Form, Felder und Views des Boards.
   Annahme eines feldübergreifenden OR entworfen werden
 
 ## Akzeptanzkriterien
-- [ ] Ein einzelnes Projects-V2-Projekt auf User-Ebene aggregiert offene Issues und Pull Requests über `nolte/*`-Repositories
+- [ ] Ein einzelnes Projects-V2-Projekt im Besitz der `noltarium`-Organisation aggregiert offene Issues und Pull Requests über `nolte/*`-Repositories
 - [ ] Ein Single-Select-Feld `Status` existiert mit `Todo`, `In Progress` und einer stabilen `Done`-Option
 - [ ] Abhängigkeits-Update-Pull-Requests tragen einheitlich das Label `dependencies` (Dependabot-Default plus das Renovate-Preset, das es vergibt)
 - [ ] Eine View **Daily development** schließt Abhängigkeits-Updates aus; eine View **Release management** hebt auslieferungsbereite Pull Requests hervor
