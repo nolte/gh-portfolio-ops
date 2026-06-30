@@ -20,8 +20,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Surface merged-but-unreleased PRs on the board
         env:
-          # Same classic PAT as merge-queue-sync (repo + project scopes).
+          # Same classic PAT as merge-queue-sync (nolte, org admin — writes the org board).
           GH_TOKEN: ${{ secrets.MERGE_QUEUE_TOKEN }}
-          OWNER: nolte
+          REPO_OWNER: nolte
+          PROJECT_OWNER: noltarium
           PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
         run: bash scripts/unreleased-sync.sh

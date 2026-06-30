@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Surface merged-but-unreleased pull requests across nolte/* on the merge-queue
-# board (#PROJECT_NUMBER) in the "Unreleased" Status column, downstream of Done.
+# board in the "Unreleased" Status column, downstream of Done.
 #
 # A merged PR is "unreleased" iff its merge_commit_sha is reachable from the
 # repository's development tip (develop, or the default branch) and NOT from the
@@ -10,10 +10,13 @@
 # A repository with no published release treats every merged PR as unreleased.
 # Per spec/unreleased-changes/.
 #
+# The board may be owned by a user or an organisation; it is addressed by its
+# node id, so the GraphQL reads are owner-agnostic. Source repositories and the
+# board can have different owners (repos under nolte/*, board under noltarium).
+#
 # Two phases:
 #   A. Transition every board item whose PR is merged: unreleased -> Status
-#      "Unreleased"; already released -> remove from the board. This moves cards
-#      from Done to Unreleased (incl. repos without any release).
+#      "Unreleased"; already released -> remove from the board.
 #   B. Discover merged-but-unreleased PRs in repos that have a release and are
 #      not yet on the board, and add them as Unreleased.
 #
@@ -21,7 +24,9 @@
 #   GH_TOKEN         token with repo read + project read/write
 #   PROJECT_NUMBER   the Projects V2 board number
 # Optional:
-#   OWNER             default: nolte
+#   REPO_OWNER        owner of the source repositories, default: nolte (or $OWNER)
+#   PROJECT_OWNER     owner of the board (user or org),  default: nolte (or $OWNER)
+#   OWNER             back-compat default for both, default: nolte
 #   UNRELEASED_OPTION Status option name, default: Unreleased
 #
 # The $-prefixed names inside the single-quoted `gh api graphql -f query='…'`
@@ -30,20 +35,22 @@
 set -euo pipefail
 
 OWNER="${OWNER:-nolte}"
+REPO_OWNER="${REPO_OWNER:-$OWNER}"
+PROJECT_OWNER="${PROJECT_OWNER:-$OWNER}"
 PROJECT_NUMBER="${PROJECT_NUMBER:?set PROJECT_NUMBER}"
 UNRELEASED_OPTION="${UNRELEASED_OPTION:-Unreleased}"
 
-# Resolve project id, Status field id, and the Unreleased option id up front.
-read -r PROJECT_ID FIELD_ID OPTION_ID < <(gh api graphql -f query='
-query($l:String!,$n:Int!){
-  user(login:$l){ projectV2(number:$n){
-    id
-    field(name:"Status"){ ... on ProjectV2SingleSelectField { id options { id name } } }
-  }}
-}' -F l="$OWNER" -F n="$PROJECT_NUMBER" \
-  --jq ".data.user.projectV2 | [.id, .field.id, ((.field.options[] | select(.name==\"$UNRELEASED_OPTION\") | .id) // \"\")] | @tsv")
-
-if [ -z "${OPTION_ID:-}" ]; then
+# Resolve the board node id, the Status field id, and the Unreleased option id
+# (owner-agnostic via the gh project CLI).
+PROJECT_ID=$(gh project view "$PROJECT_NUMBER" --owner "$PROJECT_OWNER" --format json --jq '.id')
+[ -n "$PROJECT_ID" ] || {
+  echo "Could not resolve project #$PROJECT_NUMBER for owner $PROJECT_OWNER" >&2
+  exit 1
+}
+status_field=$(gh project field-list "$PROJECT_NUMBER" --owner "$PROJECT_OWNER" --format json --jq '.fields[] | select(.name=="Status")')
+FIELD_ID=$(jq -r '.id' <<<"$status_field")
+OPTION_ID=$(jq -r --arg n "$UNRELEASED_OPTION" '(.options[] | select(.name==$n) | .id) // ""' <<<"$status_field")
+if [ -z "$OPTION_ID" ]; then
   echo "No '$UNRELEASED_OPTION' Status option on project #$PROJECT_NUMBER — add it in the board UI first." >&2
   exit 1
 fi
@@ -97,28 +104,27 @@ while IFS=$'\t' read -r item_id state nwo sha statusname url; do
       }
     fi
   else
-    gh project item-delete "$PROJECT_NUMBER" --owner "$OWNER" --id "$item_id" >/dev/null 2>&1 && {
+    gh project item-delete "$PROJECT_NUMBER" --owner "$PROJECT_OWNER" --id "$item_id" >/dev/null 2>&1 && {
       echo "  x released, removed: $url"
       removed=$((removed + 1))
     }
   fi
-done < <(gh api graphql --paginate -f query='query($l:String!,$n:Int!,$endCursor:String){user(login:$l){projectV2(number:$n){items(first:100,after:$endCursor){pageInfo{hasNextPage endCursor} nodes{id status:fieldValueByName(name:"Status"){... on ProjectV2ItemFieldSingleSelectValue{name}} content{... on PullRequest{url state mergeCommit{oid} repository{nameWithOwner}}}}}}}}' \
-  -F l="$OWNER" -F n="$PROJECT_NUMBER" \
-  --jq '.data.user.projectV2.items.nodes[] | select(.content.url != null) | [.id, (.content.state // "-"), (.content.repository.nameWithOwner // "-"), (.content.mergeCommit.oid // "-"), (.status.name // "-"), .content.url] | @tsv')
+done < <(gh api graphql --paginate -f query='query($pid:ID!,$endCursor:String){node(id:$pid){... on ProjectV2{items(first:100,after:$endCursor){pageInfo{hasNextPage endCursor} nodes{id status:fieldValueByName(name:"Status"){... on ProjectV2ItemFieldSingleSelectValue{name}} content{... on PullRequest{url state mergeCommit{oid} repository{nameWithOwner}}}}}}}}' \
+  -F pid="$PROJECT_ID" \
+  --jq '.data.node.items.nodes[] | select(.content.url != null) | [.id, (.content.state // "-"), (.content.repository.nameWithOwner // "-"), (.content.mergeCommit.oid // "-"), (.status.name // "-"), .content.url] | @tsv')
 echo "Phase A: moved ${moved} to '${UNRELEASED_OPTION}', removed ${removed} now-released."
 echo "::endgroup::"
 
 # ---- Phase B: discover merged-unreleased PRs not yet on the board ----
-echo "::group::Discover merged-but-unreleased PRs across ${OWNER}/*"
-mapfile -t REPOS < <(gh repo list "$OWNER" --no-archived --source --limit 300 --json nameWithOwner --jq '.[].nameWithOwner')
+echo "::group::Discover merged-but-unreleased PRs across ${REPO_OWNER}/*"
+mapfile -t REPOS < <(gh repo list "$REPO_OWNER" --no-archived --source --limit 300 --json nameWithOwner --jq '.[].nameWithOwner')
 echo "Scanning ${#REPOS[@]} non-archived repositories"
 added=0
 no_release=0
 for repo in "${REPOS[@]}"; do
   compute_repo "$repo"
   # Discovery is bounded to repos with a release; merged PRs in release-less repos
-  # are surfaced only when they already are board items (handled in Phase A),
-  # never by dumping the whole merged history.
+  # are surfaced only when they already are board items (handled in Phase A).
   if [ "${UNREL_SET[$repo]}" = "__ALL__" ]; then
     no_release=$((no_release + 1))
     continue
@@ -128,7 +134,7 @@ for repo in "${REPOS[@]}"; do
     [ -z "$prurl" ] && continue
     [ -n "${ON_BOARD[$prurl]+x}" ] && continue
     if grep -qxF "$mc" <<<"${UNREL_SET[$repo]}"; then
-      item_id=$(gh project item-add "$PROJECT_NUMBER" --owner "$OWNER" --url "$prurl" --format json --jq '.id' 2>/dev/null || true)
+      item_id=$(gh project item-add "$PROJECT_NUMBER" --owner "$PROJECT_OWNER" --url "$prurl" --format json --jq '.id' 2>/dev/null || true)
       if [ -z "$item_id" ]; then
         echo "  ! could not add $prurl"
         continue

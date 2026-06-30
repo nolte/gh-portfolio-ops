@@ -20,7 +20,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync board and apply automerge label
         env:
+          # Same classic PAT (nolte, org admin) writes the noltarium org board.
           GH_TOKEN: ${{ secrets.MERGE_QUEUE_TOKEN }}
-          OWNER: nolte
+          REPO_OWNER: nolte
+          PROJECT_OWNER: noltarium
           PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
         run: bash scripts/merge-queue-sync.sh
