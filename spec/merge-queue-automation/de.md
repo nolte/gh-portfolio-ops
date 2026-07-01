@@ -62,14 +62,17 @@ gh-plumbing-Automerge-Workflow und die Spec `release-automation`).
 
 ### Authentifizierung
 - **MUSS** sich mit einem klassischen Personal Access Token authentifizieren, das
-  den `project`-Scope (Projektdaten lesen und schreiben) und den `repo`-Scope
-  (Pull-Request-Labels bearbeiten) trägt
-- **DARF NICHT** auf einem fein granularen Personal Access Token beruhen: dessen
-  `project`-Berechtigung liegt unter dem Organizations-Tab, den persönliche
-  Accounts nicht haben, sodass fein granulare Tokens persönliche Projekte nicht
-  erreichen können
+  den `project`-Scope (Projektdaten lesen und schreiben), den `repo`-Scope
+  (Pull-Request-Labels bearbeiten) und den `read:org`-Scope trägt — das Board
+  gehört der `noltarium`-Organisation, und ohne `read:org` kann die
+  `gh project`-CLI den Owner nicht klassifizieren und scheitert mit
+  `unknown owner type`
+- **DARF NICHT** für diesen Workflow auf einem fein granularen Personal Access
+  Token beruhen: das klassische PAT ist der unterstützte Weg für das
+  Owner-übergreifende Setup (org-eigenes Board, `nolte/*`-Quell-Repositories)
 - **DARF NICHT** auf einem GitHub-App-Installations-Token zum Lesen des Projekts
-  beruhen: Eine GitHub App kann User-Account-V2-Projekte nicht erreichen
+  beruhen: Der Poller authentifiziert sich als der Token-besitzende User, nicht als
+  App-Installation
 - **MUSS** das Token aus einem von Terraform (`terraform-github-bootstrap`)
   bereitgestellten Repository-Secret lesen; das Token **DARF NICHT** eingecheckt
   werden
@@ -131,7 +134,7 @@ gh-plumbing-Automerge-Workflow und die Spec `release-automation`).
 
 ## Akzeptanzkriterien
 - [ ] Ein geplanter Workflow (Cron-Intervall ≥ 5 Minuten) gleicht das Board ab; die Automatisierung beruht auf keinem Projekt-Webhook oder Projekt-Event-Trigger
-- [ ] Die Authentifizierung nutzt ein klassisches PAT mit `project`- und `repo`-Scopes, aus einem von Terraform bereitgestellten Repository-Secret, niemals eingecheckt
+- [ ] Die Authentifizierung nutzt ein klassisches PAT mit `project`-, `repo`- und `read:org`-Scopes, aus einem von Terraform bereitgestellten Repository-Secret, niemals eingecheckt
 - [ ] Jeder offene `nolte/*`-Pull-Request wird idempotent zum Board hinzugefügt
 - [ ] Pull Requests aus archivierten Repositories werden weder hinzugefügt noch behalten: Die Quell-Abfrage filtert mit `--archived=false`, und ein Prune-Pass entfernt Board-Items, deren Repository archiviert ist
 - [ ] Der Projects-Built-in-Workflow *Auto-archive items* ist aktiviert, sodass gemergte/geschlossene Pull Requests ohne manuelle Aktion das aktive Board verlassen

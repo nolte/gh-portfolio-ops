@@ -20,7 +20,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Surface merged-but-unreleased PRs on the board
         env:
-          # Same classic PAT as merge-queue-sync (nolte, org admin — writes the org board).
+          # Same classic PAT as merge-queue-sync (repo + project + read:org; read:org
+          # lets gh project resolve the noltarium org board — else "unknown owner type").
           GH_TOKEN: ${{ secrets.MERGE_QUEUE_TOKEN }}
           REPO_OWNER: nolte
           PROJECT_OWNER: noltarium

@@ -31,7 +31,7 @@ Each run:
 | Knob | Where | Meaning |
 |---|---|---|
 | `PROJECT_NUMBER` | repo variable (Terraform) | the board's number |
-| `MERGE_QUEUE_TOKEN` | repo secret (Terraform, value from gopass) | PAT with `repo` + `project` |
+| `MERGE_QUEUE_TOKEN` | repo secret (Terraform, value from gopass) | PAT with `repo` + `project` + `read:org` |
 | `DONE_OPTION` | env (default `Done`) | Status option that triggers the label |
 | `LABEL` | env (default `automerge`) | label applied to PRs in Done |
 
@@ -75,8 +75,10 @@ One-time, manual:
    `gh project create --owner noltarium --title "PR Merge Queue"` (the default
    `Status` field already carries a `Done` option). The board is owned by the
    **noltarium** org; the source repositories stay under `nolte/*`.
-2. Mint a **classic** PAT with `repo` + `project` scopes in the GitHub UI —
-   neither Terraform nor any API can create it. It is provisioned onto this repo
+2. Mint a **classic** PAT with `repo` + `project` + `read:org` scopes in the
+   GitHub UI — neither Terraform nor any API can create it. `read:org` is what lets
+   `gh project` resolve the org-owned board; without it every run fails with
+   `unknown owner type`. It is provisioned onto this repo
    as the `MERGE_QUEUE_TOKEN` secret, and the board number as the
    `PROJECT_NUMBER` variable, by Terraform in `terraform-github-bootstrap`
    (`terraform/portfolio-ops/`).

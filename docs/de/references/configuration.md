@@ -32,8 +32,9 @@ Lokale, gitignored Werte:
 - `terraform/portfolio-ops/terraform.tfvars` → `project_number = 1`
   (das Board unter `https://github.com/orgs/noltarium/projects/1`). Das Board liegt
   unter der **noltarium**-Organisation; die Workflows setzen `PROJECT_OWNER=noltarium`,
-  während die Quell-Repositories unter `nolte/*` bleiben (`REPO_OWNER=nolte`). Derselbe
-  klassische PAT funktioniert, weil `nolte` Org-Admin ist.
+  während die Quell-Repositories unter `nolte/*` bleiben (`REPO_OWNER=nolte`). Da das
+  Board org-eigen ist, braucht das klassische PAT zusätzlich die `read:org`-Scope,
+  damit `gh project` `noltarium` als Organisations-Owner auflösen kann (siehe unten).
 - `terraform/repos/terraform.tfvars` → der `gh-portfolio-ops`-Repository-Block
   (Visibility `public`, Default-Branch `develop`, das obige Ruleset).
 - `terraform/portfolio-app/terraform.tfvars` → `gh-portfolio-ops` in
@@ -63,18 +64,19 @@ via `source scripts/portfolio-app-env.sh && task tf:apply:portfolio-app`.
 Das `MERGE_QUEUE_TOKEN`-Secret hält einen Personal Access Token. Terraform
 speichert ihn, kann ihn aber nicht erzeugen:
 
-- **Typ:** klassisches PAT — ein fein granulares PAT erreicht
-  User-Account-Projects-V2 nicht.
-- **Benötigte Scopes** — genau diese zwei Top-Level-Checkboxen anhaken unter
+- **Typ:** klassisches PAT — ein fein granulares PAT erreicht Projects V2 nicht so,
+  wie die `gh project`-CLI es für dieses Owner-übergreifende Setup erwartet.
+- **Benötigte Scopes** — genau diese drei Top-Level-Checkboxen anhaken unter
   *Settings → Developer settings → Personal access tokens → Tokens (classic)*:
 
   | Scope | Wofür der Sync ihn braucht |
   |---|---|
   | `repo` (voll) | Das `automerge`-Label an Pull Requests über jedes `nolte/*`-Repository — private eingeschlossen — vergeben via `POST /repos/{owner}/{repo}/issues/{n}/labels`, und die offenen Pull Requests zum Board-Abgleich lesen. |
-  | `project` | Das User-Level-Projects-V2-Board lesen und schreiben: Items hinzufügen, den `Status` jedes Items lesen und Items aus archivierten Repositories löschen. Das Anhaken von `project` schließt `read:project` ein. |
+  | `project` | Das **noltarium**-Organisations-Projects-V2-Board lesen und schreiben: Items hinzufügen, den `Status` jedes Items lesen und Items aus archivierten Repositories löschen. Das Anhaken von `project` schließt `read:project` ein. |
+  | `read:org` | Damit `gh project` `noltarium` als **Organisations**-Owner auflösen kann. Ohne diese Scope kann die CLI den Owner nicht klassifizieren und jeder Board-Befehl scheitert mit `unknown owner type`. Nötig, seit das Board vom User-Account in die Org umgezogen ist. |
 
   Keine weiteren Scopes nötig — `admin:*`, `workflow` oder `delete_repo` nicht
-  vergeben.
+  vergeben (`read:org` allein genügt; das umfassendere `admin:org` ist nicht nötig).
 - **Gementet** nur im GitHub-UI.
 - **Gespeichert** in gopass:
   `gopass insert internet/github.com/nolte/tokens/gh-portfolio-ops/merge-queue-pat`.

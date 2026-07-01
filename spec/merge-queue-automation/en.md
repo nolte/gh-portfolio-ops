@@ -55,13 +55,15 @@ downstream (that is the gh-plumbing automerge workflow and the
 
 ### Authentication
 - **MUST** authenticate with a classic personal access token carrying the
-  `project` scope (read and write project data) and the `repo` scope (to edit
-  pull-request labels)
-- **MUST NOT** rely on a fine-grained personal access token: its `project`
-  permission lives under the Organizations tab, which personal accounts do not
-  have, so fine-grained tokens cannot reach personal-account projects
-- **MUST NOT** rely on a GitHub App installation token to read the project: a
-  GitHub App cannot reach user-account V2 projects
+  `project` scope (read and write project data), the `repo` scope (to edit
+  pull-request labels), and the `read:org` scope — the board is owned by the
+  `noltarium` organisation, and without `read:org` the `gh project` CLI cannot
+  classify the owner and fails with `unknown owner type`
+- **MUST NOT** rely on a fine-grained personal access token for this workflow: the
+  classic PAT is the supported path for the cross-owner setup (org-owned board,
+  `nolte/*` source repositories)
+- **MUST NOT** rely on a GitHub App installation token to read the project: the
+  poller authenticates as the token-owning user, not as an App installation
 - **MUST** read the token from a repository secret provisioned by Terraform
   (`terraform-github-bootstrap`); the token **MUST NOT** be committed
 
@@ -115,7 +117,7 @@ downstream (that is the gh-plumbing automerge workflow and the
 
 ## Acceptance Criteria
 - [ ] A scheduled workflow (cron interval ≥ 5 minutes) reconciles the board; the automation relies on no project webhook or project event trigger
-- [ ] Authentication uses a classic PAT with `project` and `repo` scopes, sourced from a Terraform-provisioned repository secret, never committed
+- [ ] Authentication uses a classic PAT with `project`, `repo`, and `read:org` scopes, sourced from a Terraform-provisioned repository secret, never committed
 - [ ] Every open `nolte/*` pull request is added to the board idempotently
 - [ ] Pull requests from archived repositories are neither added nor retained: the source query filters with `--archived=false` and a prune pass removes board items whose repository is archived
 - [ ] The Projects built-in *Auto-archive items* workflow is enabled so merged/closed pull requests leave the active board without manual action

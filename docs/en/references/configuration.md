@@ -32,8 +32,9 @@ Local, git-ignored values:
 - `terraform/portfolio-ops/terraform.tfvars` → `project_number = 1`
   (the board at `https://github.com/orgs/noltarium/projects/1`). The board lives
   under the **noltarium** organisation; the workflows set `PROJECT_OWNER=noltarium`
-  while the source repositories stay under `nolte/*` (`REPO_OWNER=nolte`). The
-  same classic PAT works because `nolte` is an org admin.
+  while the source repositories stay under `nolte/*` (`REPO_OWNER=nolte`). Because
+  the board is org-owned, the classic PAT additionally needs the `read:org` scope
+  so `gh project` can resolve `noltarium` as an organisation owner (see below).
 - `terraform/repos/terraform.tfvars` → the `gh-portfolio-ops` repository block
   (visibility `public`, default branch `develop`, the ruleset above).
 - `terraform/portfolio-app/terraform.tfvars` → `gh-portfolio-ops` listed in
@@ -61,18 +62,19 @@ via `source scripts/portfolio-app-env.sh && task tf:apply:portfolio-app`.
 The `MERGE_QUEUE_TOKEN` secret holds a personal access token. Terraform stores
 it, but cannot create it:
 
-- **Type:** classic PAT — a fine-grained PAT cannot reach personal-account
-  Projects V2.
-- **Required scopes** — tick exactly these two top-level checkboxes under
+- **Type:** classic PAT — a fine-grained PAT cannot reach Projects V2 the way the
+  `gh project` CLI expects for this cross-owner setup.
+- **Required scopes** — tick exactly these three top-level checkboxes under
   *Settings → Developer settings → Personal access tokens → Tokens (classic)*:
 
   | Scope | Why the sync needs it |
   |---|---|
   | `repo` (full) | Apply the `automerge` label to pull requests across every `nolte/*` repository — private ones included — via `POST /repos/{owner}/{repo}/issues/{n}/labels`, and read the open pull requests to reconcile the board. |
-  | `project` | Read and write the user-level Projects V2 board: add items, read each item's `Status`, and delete items from archived repositories. Ticking `project` also includes `read:project`. |
+  | `project` | Read and write the **noltarium** organisation Projects V2 board: add items, read each item's `Status`, and delete items from archived repositories. Ticking `project` also includes `read:project`. |
+  | `read:org` | Let `gh project` resolve `noltarium` as an **organisation** owner. Without it the CLI cannot classify the owner and every board command fails with `unknown owner type`. Required since the board moved from the user account to the org. |
 
   No other scopes are required — do not grant `admin:*`, `workflow`, or
-  `delete_repo`.
+  `delete_repo` (`read:org` alone is enough; the broader `admin:org` is not needed).
 - **Minted** in the GitHub UI only.
 - **Stored** in gopass:
   `gopass insert internet/github.com/nolte/tokens/gh-portfolio-ops/merge-queue-pat`.
